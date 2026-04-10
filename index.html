@@ -1503,62 +1503,46 @@ function closeModal(name) {
 // AUTH
 // =====================================================
 function doLogin() {
-  var email = el('login-email').value.trim();
+  var email = el('login-email').value.trim().toLowerCase();
   var pass  = el('login-pass').value;
   var errEl = el('login-err');
-  var btn   = el('login-submit-btn');
   if (!email || !pass) { errEl.classList.add('show'); return; }
-  btn.disabled = true; btn.textContent = 'Signing in…';
-  apiPost('/auth/login', { email: email, password: pass })
-    .then(function(res) {
-      if (res.ok) {
-        localStorage.setItem('jlp_token', res.data.access_token);
-        loginSuccess(res.data.user);
-      } else {
-        errEl.textContent = res.data.error || 'Invalid email or password.';
-        errEl.classList.add('show');
-        setTimeout(function() { errEl.classList.remove('show'); }, 3000);
-      }
-    })
-    .catch(function() {
-      errEl.textContent = 'Cannot reach server. Is the backend running?';
-      errEl.classList.add('show');
-      setTimeout(function() { errEl.classList.remove('show'); }, 4000);
-    })
-    .finally(function() { btn.disabled = false; btn.textContent = 'Sign in'; });
+  var users = JSON.parse(localStorage.getItem('jlp_users') || '{}');
+  var user  = users[email];
+  if (!user || user.password !== pass) {
+    errEl.textContent = 'Invalid email or password.';
+    errEl.classList.add('show');
+    setTimeout(function() { errEl.classList.remove('show'); }, 3000);
+    return;
+  }
+  localStorage.setItem('jlp_session', JSON.stringify(user));
+  loginSuccess(user);
 }
 
 function doSignup() {
   var name    = el('signup-name').value.trim();
-  var email   = el('signup-email').value.trim();
+  var email   = el('signup-email').value.trim().toLowerCase();
   var pass    = el('signup-pass').value;
   var company = el('signup-company').value.trim();
   var errEl   = el('signup-err');
-  var btn     = el('signup-submit-btn');
   if (!name || !email || pass.length < 6) {
     errEl.textContent = !name ? 'Please enter your name.' : !email ? 'Please enter your email.' : 'Password must be at least 6 characters.';
     errEl.classList.add('show');
     setTimeout(function() { errEl.classList.remove('show'); }, 3000);
     return;
   }
-  btn.disabled = true; btn.textContent = 'Creating account…';
-  apiPost('/auth/signup', { name: name, email: email, password: pass, company: company, plan: state.selectedPlan })
-    .then(function(res) {
-      if (res.ok) {
-        localStorage.setItem('jlp_token', res.data.access_token);
-        loginSuccess(res.data.user);
-      } else {
-        errEl.textContent = res.data.error || 'Signup failed. Please try again.';
-        errEl.classList.add('show');
-        setTimeout(function() { errEl.classList.remove('show'); }, 3000);
-      }
-    })
-    .catch(function() {
-      errEl.textContent = 'Cannot reach server. Is the backend running?';
-      errEl.classList.add('show');
-      setTimeout(function() { errEl.classList.remove('show'); }, 4000);
-    })
-    .finally(function() { btn.disabled = false; btn.textContent = 'Create account'; });
+  var users = JSON.parse(localStorage.getItem('jlp_users') || '{}');
+  if (users[email]) {
+    errEl.textContent = 'An account with that email already exists.';
+    errEl.classList.add('show');
+    setTimeout(function() { errEl.classList.remove('show'); }, 3000);
+    return;
+  }
+  var user = { name: name, email: email, password: pass, company: company, plan: state.selectedPlan || 'free' };
+  users[email] = user;
+  localStorage.setItem('jlp_users', JSON.stringify(users));
+  localStorage.setItem('jlp_session', JSON.stringify(user));
+  loginSuccess(user);
 }
 
 function loginSuccess(user) {
@@ -1573,7 +1557,7 @@ function loginSuccess(user) {
 }
 
 function logout() {
-  localStorage.removeItem('jlp_token');
+  localStorage.removeItem('jlp_session');
   state.user = null;
   state.calcCount = 0;
   el('nav-guest').style.display = '';
@@ -1582,13 +1566,9 @@ function logout() {
 }
 
 function tryAutoLogin() {
-  var token = localStorage.getItem('jlp_token');
-  if (!token) return;
-  apiGet('/auth/me', token)
-    .then(function(user) {
-      if (user && user.id) loginSuccess(user);
-    })
-    .catch(function() { localStorage.removeItem('jlp_token'); });
+  var session = localStorage.getItem('jlp_session');
+  if (!session) return;
+  try { loginSuccess(JSON.parse(session)); } catch(e) { localStorage.removeItem('jlp_session'); }
 }
 
 function selectPlan(plan) {
