@@ -578,29 +578,12 @@ footer{padding:40px 5% 26px;position:relative;z-index:1;border-top:1px solid var
     </div>
   </section>
 
-  <section class="lp-section cta-section" id="waitlist">
-    <div style="max-width:480px;width:100%" class="fade-up">
-      <div class="section-tag">Early access</div>
-      <h2>Be the first tech on JLoadPro.</h2>
-      <p class="section-sub">Join the waitlist and get 3 months of Pro free when we launch publicly.</p>
-      <div id="waitlist-form-wrap" style="margin-top:28px;display:flex;flex-direction:column;gap:14px">
-        <div class="field">
-          <label>Full name</label>
-          <input type="text" id="wl-name" placeholder="John Smith" autocomplete="off">
-        </div>
-        <div class="field">
-          <label>Email address</label>
-          <input type="email" id="wl-email" placeholder="you@email.com" autocomplete="off">
-        </div>
-        <button class="btn btn-primary" id="waitlist-btn" style="width:100%;justify-content:center;padding:13px">Join the Waitlist <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <p id="wl-err" style="font-size:13px;color:var(--red);display:none;margin:0">Please fill in both fields.</p>
-      </div>
-      <div id="waitlist-success" style="display:none;margin-top:28px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:10px;padding:22px 20px;text-align:center">
-        <div style="font-size:28px;margin-bottom:8px">✓</div>
-        <div style="font-size:17px;font-weight:600;color:var(--green);margin-bottom:6px">You're on the list!</div>
-        <div style="font-size:14px;color:var(--white2)">We'll reach out as soon as JLoadPro is ready to launch.</div>
-      </div>
-      <p style="font-size:13px;color:var(--muted);margin-top:14px">No spam. No credit card. Just your spot in line.</p>
+  <section class="lp-section cta-section">
+    <div style="max-width:480px;width:100%;text-align:center" class="fade-up">
+      <div class="section-tag">Get started</div>
+      <h2>Start your first calc free.</h2>
+      <p class="section-sub">No credit card needed. Sign up and run a complete Manual J in minutes.</p>
+      <button class="btn btn-primary" onclick="openModal('signup')" style="margin-top:28px;padding:13px 32px;font-size:16px">Create free account <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
   </section>
 
@@ -2312,26 +2295,6 @@ function wireEvents() {
   el('price-pro-btn').onclick   = function() { openModal('signup','pro'); };
   el('price-team-btn').onclick  = function() { openModal('pricing'); };
 
-  // Waitlist
-  el('waitlist-btn').onclick = function() {
-    var name  = el('wl-name').value.trim();
-    var email = el('wl-email').value.trim();
-    var err   = el('wl-err');
-    if (!name || !email || !email.includes('@')) { err.style.display = 'block'; return; }
-    err.style.display = 'none';
-    var btn = el('waitlist-btn');
-    btn.disabled = true;
-    btn.textContent = 'Submitting…';
-    var formData = new FormData();
-    formData.append('d2d79f2a-943a-4e3b-8a19-e22c39ba9c81', name);
-    formData.append('31309068-fd04-4152-ad93-3105db89f723', email);
-    fetch('https://tally.so/r/Y5rM1J', { method: 'POST', body: formData, mode: 'no-cors' })
-      .catch(function() {})
-      .finally(function() {
-        el('waitlist-form-wrap').style.display = 'none';
-        el('waitlist-success').style.display = 'block';
-      });
-  };
 
   // Footer
   el('footer-logo').onclick     = function() { showView('landing'); };
