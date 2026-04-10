@@ -385,7 +385,7 @@ footer{padding:40px 5% 26px;position:relative;z-index:1;border-top:1px solid var
     <li><a id="nav-howitworks">How it works</a></li>
     <li><a id="nav-pricing">Pricing</a></li>
     <li><a class="nav-login" id="nav-login-btn">Log in</a></li>
-    <li><a class="nav-cta" id="nav-signup-btn">Get early access</a></li>
+    <li><a class="nav-cta" id="nav-signup-btn">Sign Up Free</a></li>
   </ul>
   <div id="nav-auth" class="nav-user" style="display:none">
     <a id="nav-dash-link" style="font-size:13px;color:var(--muted);cursor:pointer;text-decoration:none;transition:color .2s">Dashboard</a>
@@ -451,7 +451,7 @@ footer{padding:40px 5% 26px;position:relative;z-index:1;border-top:1px solid var
       <div class="fade-up">
         <div class="section-tag">AR photo measurement</div>
         <h2>Snap a photo.<br>Skip the tape measure.</h2>
-        <p style="font-size:17px;color:var(--white2);font-weight:300;line-height:1.65;margin-bottom:28px">Point your phone at any room, window, or laser measure display. JLoadPro reads the dimensions automatically and fills the field. No more squinting at tape measures or re-entering numbers from a notepad.</p>
+        <p style="font-size:17px;color:var(--white2);font-weight:300;line-height:1.65;margin-bottom:28px">Point your phone at any room, window, laser measure display, floor plan, blueprint, or hand-drawn sketch. JLoadPro reads the dimensions automatically and fills the field. No more squinting at tape measures or re-entering numbers from a notepad.</p>
         <div class="ar-point">
           <div class="ar-point-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="1.75" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7l-2-3H10L8 7"/><circle cx="12" cy="14" r="3"/></svg></div>
           <div><div class="ar-point-title">Rooms and floor plans</div><div class="ar-point-desc">Photograph a floor plan, blueprint, or hand-drawn sketch. AI reads the room dimensions and calculates square footage instantly.</div></div>
@@ -579,15 +579,28 @@ footer{padding:40px 5% 26px;position:relative;z-index:1;border-top:1px solid var
   </section>
 
   <section class="lp-section cta-section" id="waitlist">
-    <div style="max-width:540px" class="fade-up">
+    <div style="max-width:480px;width:100%" class="fade-up">
       <div class="section-tag">Early access</div>
       <h2>Be the first tech on JLoadPro.</h2>
       <p class="section-sub">Join the waitlist and get 3 months of Pro free when we launch publicly.</p>
-      <div class="email-row">
-        <input type="email" class="email-inp" id="waitlist-email" placeholder="your@email.com">
-        <button class="btn btn-primary" id="waitlist-btn">Join waitlist <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div id="waitlist-form-wrap" style="margin-top:28px;display:flex;flex-direction:column;gap:14px">
+        <div class="field">
+          <label>Full name</label>
+          <input type="text" id="wl-name" placeholder="John Smith" autocomplete="off">
+        </div>
+        <div class="field">
+          <label>Email address</label>
+          <input type="email" id="wl-email" placeholder="you@email.com" autocomplete="off">
+        </div>
+        <button class="btn btn-primary" id="waitlist-btn" style="width:100%;justify-content:center;padding:13px">Join the Waitlist <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <p id="wl-err" style="font-size:13px;color:var(--red);display:none;margin:0">Please fill in both fields.</p>
       </div>
-      <p style="font-size:13px;color:var(--muted);margin-top:11px">No spam. No credit card. Just your spot in line.</p>
+      <div id="waitlist-success" style="display:none;margin-top:28px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:10px;padding:22px 20px;text-align:center">
+        <div style="font-size:28px;margin-bottom:8px">✓</div>
+        <div style="font-size:17px;font-weight:600;color:var(--green);margin-bottom:6px">You're on the list!</div>
+        <div style="font-size:14px;color:var(--white2)">We'll reach out as soon as JLoadPro is ready to launch.</div>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-top:14px">No spam. No credit card. Just your spot in line.</p>
     </div>
   </section>
 
@@ -842,10 +855,12 @@ footer{padding:40px 5% 26px;position:relative;z-index:1;border-top:1px solid var
           <div class="field fspan"><label>Project name</label><input type="text" id="proj-name" placeholder="e.g. 123 Main St - Smith Residence"></div>
           <div class="field"><label>Client name</label><input type="text" placeholder="John Smith"></div>
           <div class="field"><label>Your company</label><input type="text" placeholder="Your company name"></div>
-          <div class="field" style="position:relative">
+          <div class="field">
             <label>City, State</label>
-            <input type="text" id="city-state" placeholder="Atlanta, GA" autocomplete="off">
-            <div id="city-suggestions"></div>
+            <div style="position:relative">
+              <input type="text" id="city-state" placeholder="Atlanta, GA" autocomplete="off">
+              <div id="city-suggestions"></div>
+            </div>
           </div>
           <div class="field"><label>Zip code</label><div class="inp-row"><input type="text" id="zipcode" placeholder="e.g. 07030" maxlength="5"><button class="cam-btn" title="Photo upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7l-2-3H10L8 7"/><circle cx="12" cy="14" r="3"/></svg><input type="file" accept="image/*" capture="environment" data-target="zipcode"></button></div><span class="field-hint" id="zip-hint">Start typing — climate data loads automatically</span></div>
           <div class="field"><label>Building type</label><select id="bldg-type"><option value="residential">Residential - single family</option><option value="multifamily">Residential - multifamily</option><option value="office">Light commercial (office)</option><option value="retail">Light commercial (retail)</option></select></div>
@@ -887,7 +902,7 @@ footer{padding:40px 5% 26px;position:relative;z-index:1;border-top:1px solid var
           <div class="field"><label>Ceiling height (ft)</label><div class="inp-row"><input type="number" id="ceiling-ht" value="9"><button class="cam-btn" title="Photo upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7l-2-3H10L8 7"/><circle cx="12" cy="14" r="3"/></svg><input type="file" accept="image/*" capture="environment" data-target="ceiling-ht"></button></div></div>
           <div class="field"><label>Number of bedrooms</label><div class="inp-row"><input type="number" id="bedrooms" value="3"><button class="cam-btn" title="Photo upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7l-2-3H10L8 7"/><circle cx="12" cy="14" r="3"/></svg><input type="file" accept="image/*" capture="environment" data-target="bedrooms"></button></div></div>
           <div class="field"><label>Orientation</label><select id="orientation"><option>North</option><option selected>South</option><option>East</option><option>West</option></select></div>
-          <div class="field"><label>Year built</label><select><option>Before 1980</option><option>1980-1999</option><option selected>2000-2015</option><option>2016-present</option><option>New construction</option></select></div>
+          <div class="field"><label>Year built</label><select id="year-built"><option>Before 1980</option><option>1980-1999</option><option selected>2000-2015</option><option>2016-present</option><option>New construction</option></select></div>
         </div></div></div>
         <div class="form-nav"><div></div><span class="step-ind">Step 1 of 8</span><button class="nav-btn primary" id="next-0">Next: Design conditions <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
       </div>
@@ -1106,12 +1121,9 @@ footer{padding:40px 5% 26px;position:relative;z-index:1;border-top:1px solid var
     <div class="modal-body">
       <div class="auth-field"><label>Email address</label><input type="email" id="login-email" placeholder="you@example.com"></div>
       <div class="auth-field"><label>Password</label><input type="password" id="login-pass" placeholder="Password"></div>
-      <div class="auth-err" id="login-err">Invalid credentials. Try: demo@loadpro.io / demo1234</div>
+      <div class="auth-err" id="login-err">Invalid email or password.</div>
       <button class="btn btn-primary btn-full" style="margin-top:6px" id="login-submit-btn">Sign in</button>
-      <div class="auth-divider">or</div>
-      <button class="btn btn-ghost btn-full" id="demo-login-btn">Continue with demo account</button>
       <div class="auth-switch">No account? <a id="switch-to-signup">Sign up free</a></div>
-      <div style="margin-top:9px;font-size:12px;color:var(--muted);text-align:center">Demo: demo@loadpro.io / demo1234</div>
     </div>
   </div>
 </div>
@@ -1190,6 +1202,23 @@ footer{padding:40px 5% 26px;position:relative;z-index:1;border-top:1px solid var
 <script>
 (function() {
 "use strict";
+
+// =====================================================
+// API
+// =====================================================
+var API = 'http://localhost:8001';
+
+function apiPost(path, body, token) {
+  var headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  return fetch(API + path, { method: 'POST', headers: headers, body: JSON.stringify(body) })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); });
+}
+
+function apiGet(path, token) {
+  return fetch(API + path, { headers: { 'Authorization': 'Bearer ' + token } })
+    .then(function(r) { return r.json(); });
+}
 
 // =====================================================
 // STATE
@@ -1477,47 +1506,89 @@ function doLogin() {
   var email = el('login-email').value.trim();
   var pass  = el('login-pass').value;
   var errEl = el('login-err');
-  if ((email === 'demo@loadpro.io' && pass === 'demo1234') || (email && pass.length >= 4)) {
-    var name = email === 'demo@loadpro.io' ? 'John Doe' : email.split('@')[0];
-    var initials = name.split(' ').map(function(w) { return w[0]; }).join('').slice(0,2).toUpperCase();
-    loginSuccess({ name: name, email: email, plan: 'free', initials: initials });
-  } else {
-    errEl.classList.add('show');
-    setTimeout(function() { errEl.classList.remove('show'); }, 3000);
-  }
+  var btn   = el('login-submit-btn');
+  if (!email || !pass) { errEl.classList.add('show'); return; }
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  apiPost('/auth/login', { email: email, password: pass })
+    .then(function(res) {
+      if (res.ok) {
+        localStorage.setItem('jlp_token', res.data.access_token);
+        loginSuccess(res.data.user);
+      } else {
+        errEl.textContent = res.data.error || 'Invalid email or password.';
+        errEl.classList.add('show');
+        setTimeout(function() { errEl.classList.remove('show'); }, 3000);
+      }
+    })
+    .catch(function() {
+      errEl.textContent = 'Cannot reach server. Is the backend running?';
+      errEl.classList.add('show');
+      setTimeout(function() { errEl.classList.remove('show'); }, 4000);
+    })
+    .finally(function() { btn.disabled = false; btn.textContent = 'Sign in'; });
 }
 
 function doSignup() {
   var name    = el('signup-name').value.trim();
   var email   = el('signup-email').value.trim();
   var pass    = el('signup-pass').value;
+  var company = el('signup-company').value.trim();
   var errEl   = el('signup-err');
+  var btn     = el('signup-submit-btn');
   if (!name || !email || pass.length < 6) {
     errEl.textContent = !name ? 'Please enter your name.' : !email ? 'Please enter your email.' : 'Password must be at least 6 characters.';
     errEl.classList.add('show');
     setTimeout(function() { errEl.classList.remove('show'); }, 3000);
     return;
   }
-  var initials = name.split(' ').map(function(w) { return w[0]; }).join('').slice(0,2).toUpperCase();
-  loginSuccess({ name: name, email: email, plan: state.selectedPlan, initials: initials });
+  btn.disabled = true; btn.textContent = 'Creating account…';
+  apiPost('/auth/signup', { name: name, email: email, password: pass, company: company, plan: state.selectedPlan })
+    .then(function(res) {
+      if (res.ok) {
+        localStorage.setItem('jlp_token', res.data.access_token);
+        loginSuccess(res.data.user);
+      } else {
+        errEl.textContent = res.data.error || 'Signup failed. Please try again.';
+        errEl.classList.add('show');
+        setTimeout(function() { errEl.classList.remove('show'); }, 3000);
+      }
+    })
+    .catch(function() {
+      errEl.textContent = 'Cannot reach server. Is the backend running?';
+      errEl.classList.add('show');
+      setTimeout(function() { errEl.classList.remove('show'); }, 4000);
+    })
+    .finally(function() { btn.disabled = false; btn.textContent = 'Create account'; });
 }
 
 function loginSuccess(user) {
-  state.user = user;
+  var initials = user.name.split(' ').map(function(w) { return w[0]; }).join('').slice(0,2).toUpperCase();
+  state.user = Object.assign({}, user, { initials: initials });
   closeModal('login');
   closeModal('signup');
   el('nav-guest').style.display = 'none';
   el('nav-auth').style.display = 'flex';
-  el('nav-avatar').textContent = user.initials;
+  el('nav-avatar').textContent = initials;
   showView('dashboard');
 }
 
 function logout() {
+  localStorage.removeItem('jlp_token');
   state.user = null;
   state.calcCount = 0;
   el('nav-guest').style.display = '';
   el('nav-auth').style.display = 'none';
   showView('landing');
+}
+
+function tryAutoLogin() {
+  var token = localStorage.getItem('jlp_token');
+  if (!token) return;
+  apiGet('/auth/me', token)
+    .then(function(user) {
+      if (user && user.id) loginSuccess(user);
+    })
+    .catch(function() { localStorage.removeItem('jlp_token'); });
 }
 
 function selectPlan(plan) {
@@ -1828,7 +1899,7 @@ function recalculate() {
   var ventCfm = 7.5*(occ+1) + 0.03*sqft;
   var ventS   = ventCfm * 1.08 * dtC * (1 - ervS);
   var ventLat = ventCfm * 0.68 * Math.max(0, sWB - 50) * (1 - ervL);
-  var ventL   = ventS;
+  var ventH   = ventCfm * 1.08 * dtH * (1 - ervS);
   var vcEl    = el('vent-cfm'); if (vcEl) vcEl.value = Math.round(ventCfm);
 
   var dLocEl  = el('duct-loc'); var dLoc = dLocEl ? (parseFloat(dLocEl.value) || 0) : 0.10;
@@ -1839,7 +1910,7 @@ function recalculate() {
   var totS    = (envC + solar + iS + intS + ventS) * dMult;
   var totL    = (iL + intL + ventLat) * dMult;
   var totC    = totS + totL;
-  var totH    = (envH + iH) * dMult;
+  var totH    = (envH + iH + ventH) * dMult;
   var shr     = totS / Math.max(totC, 1);
 
   var tonsRaw = totC / 12000;
@@ -2006,17 +2077,6 @@ function submitPricingReq() {
   if (!name || !email || !co) { alert('Please fill in name, company, and email.'); return; }
   el('pr-success').style.display = 'block';
   el('pr-submit-btn').style.display = 'none';
-}
-
-function handleWaitlist() {
-  var inp = el('waitlist-email');
-  var btn = el('waitlist-btn');
-  if (!inp.value || !inp.value.includes('@')) { inp.style.borderColor = 'var(--red)'; setTimeout(function() { inp.style.borderColor = ''; }, 1500); return; }
-  btn.textContent = "You're on the list!";
-  btn.style.background = 'var(--green)';
-  inp.value = '';
-  inp.disabled = true;
-  btn.disabled = true;
 }
 
 // =====================================================
@@ -2273,7 +2333,25 @@ function wireEvents() {
   el('price-team-btn').onclick  = function() { openModal('pricing'); };
 
   // Waitlist
-  el('waitlist-btn').onclick    = handleWaitlist;
+  el('waitlist-btn').onclick = function() {
+    var name  = el('wl-name').value.trim();
+    var email = el('wl-email').value.trim();
+    var err   = el('wl-err');
+    if (!name || !email || !email.includes('@')) { err.style.display = 'block'; return; }
+    err.style.display = 'none';
+    var btn = el('waitlist-btn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+    var formData = new FormData();
+    formData.append('d2d79f2a-943a-4e3b-8a19-e22c39ba9c81', name);
+    formData.append('31309068-fd04-4152-ad93-3105db89f723', email);
+    fetch('https://tally.so/r/Y5rM1J', { method: 'POST', body: formData, mode: 'no-cors' })
+      .catch(function() {})
+      .finally(function() {
+        el('waitlist-form-wrap').style.display = 'none';
+        el('waitlist-success').style.display = 'block';
+      });
+  };
 
   // Footer
   el('footer-logo').onclick     = function() { showView('landing'); };
@@ -2342,7 +2420,6 @@ function wireEvents() {
   el('signup-close').onclick      = function() { closeModal('signup'); };
   el('pricing-close').onclick     = function() { closeModal('pricing'); };
   el('login-submit-btn').onclick  = doLogin;
-  el('demo-login-btn').onclick    = function() { el('login-email').value = 'demo@loadpro.io'; el('login-pass').value = 'demo1234'; doLogin(); };
   el('signup-submit-btn').onclick = doSignup;
   el('switch-to-signup').onclick  = function() { closeModal('login'); setTimeout(function() { openModal('signup'); }, 150); };
   el('switch-to-login').onclick   = function() { closeModal('signup'); setTimeout(function() { openModal('login'); }, 150); };
@@ -2389,7 +2466,7 @@ function wireEvents() {
   });
   var calcSelects = ['wall-type','roof-type','floor-type','win-type','int-shade','ext-shade',
     'door-type','infil-method','constr-tight','vent-type',
-    'duct-loc','duct-leak','roof-color'];
+    'duct-loc','duct-leak','roof-color','year-built'];
   calcSelects.forEach(function(id) {
     var inp = el(id);
     if (inp) inp.addEventListener('change', function() {
@@ -2433,6 +2510,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initStatsCounter();
   selectPlan('free');
   initCityAutocomplete();
+  tryAutoLogin();
 });
 
 })();
