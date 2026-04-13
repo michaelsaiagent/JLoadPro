@@ -2877,31 +2877,41 @@ function wireEvents() {
 // =====================================================
 function applyMobileLayout() {
   var mobile = window.innerWidth <= 820;
-  // Results panel
+
+  // ── Calc app layout ──
   var rp = document.querySelector('.results-panel');
   if (rp) rp.style.display = mobile ? 'none' : '';
-  // App sidebar
   var sb = document.querySelector('.app-sidebar');
   if (sb) sb.style.display = mobile ? 'none' : '';
-  // App body
   var ab = document.querySelector('.app-body');
   if (ab) {
-    ab.style.flexDirection  = mobile ? 'column' : '';
-    ab.style.height         = mobile ? 'auto'   : '';
-    ab.style.overflow       = mobile ? 'visible': '';
-    ab.style.paddingBottom  = mobile ? '68px'   : '';
+    ab.style.flexDirection = mobile ? 'column' : '';
+    ab.style.height        = mobile ? 'auto'   : '';
+    ab.style.overflow      = mobile ? 'visible': '';
+    ab.style.paddingBottom = mobile ? '68px'   : '';
   }
-  // App content
   var ac = document.querySelector('.app-content');
   if (ac) ac.style.padding = mobile ? '12px 12px 8px' : '';
-  // Save button
   var sv = el('app-save-btn');
   if (sv) sv.style.display = mobile ? 'none' : '';
-  // All form grids -> single column
+
+  // ── CSS-class grids (.fgrid / .fgrid-3) ──
   document.querySelectorAll('.fgrid,.fgrid-3').forEach(function(g) {
     g.style.gridTemplateColumns = mobile ? '1fr' : '';
   });
-  // Mobile results bar visibility
+
+  // ── Inline-styled grids (can't be overridden by CSS) ──
+  // Stores original value in data-orig-cols so desktop restore works
+  document.querySelectorAll('[style*="grid-template-columns"]').forEach(function(g) {
+    if (mobile) {
+      if (!g.dataset.origCols) g.dataset.origCols = g.style.gridTemplateColumns;
+      g.style.gridTemplateColumns = '1fr';
+    } else if (g.dataset.origCols) {
+      g.style.gridTemplateColumns = g.dataset.origCols;
+    }
+  });
+
+  // ── Mobile results bar ──
   var bar = el('mobile-results-bar');
   if (bar) bar.style.display = mobile ? 'flex' : 'none';
 }
