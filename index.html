@@ -359,11 +359,114 @@ footer{padding:40px 5% 26px;position:relative;z-index:1;border-top:1px solid var
   .ar-grid{grid-template-columns:1fr}
   .results-panel{width:220px}
 }
+
+/* ── MOBILE RESULTS BOTTOM BAR ── */
+#mobile-results-bar{display:none}
+#mobile-results-drawer{display:none}
+
 @media(max-width:768px){
+  /* NAV */
+  nav{padding:0 16px;height:54px}
   nav ul{display:none}
-  .app-sidebar{display:none}
+  .nav-mobile-btns{display:flex!important;gap:8px;align-items:center}
+
+  /* LANDING */
+  .hero{padding:90px 16px 56px}
+  h1{font-size:clamp(30px,8vw,42px);letter-spacing:-1px}
+  .hero-sub{font-size:15px;margin-bottom:28px}
+  .hero-cta{flex-direction:column;align-items:flex-start;gap:10px}
+  .btn{padding:11px 22px;font-size:14px}
+  .stats-bar{grid-template-columns:1fr 1fr}
+  .stat-item:nth-child(3){border-right:1px solid var(--border)}
+  .stat-item{padding:18px 14px}
+  .stat-num{font-size:26px}
+  .features-grid{grid-template-columns:1fr}
+  .how-grid{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr;max-width:100%}
+  .ar-grid{grid-template-columns:1fr;gap:32px}
+  .lp-section{padding:60px 16px}
+  h2{font-size:clamp(24px,6vw,36px)}
+  .section-sub{font-size:15px;margin-bottom:36px}
+
+  /* DASHBOARD */
   .dash-sidebar{display:none}
-  .dash-stats{grid-template-columns:1fr 1fr}
+  .dash-content{padding:18px 14px}
+  .dash-welcome{font-size:20px}
+  .dash-stats{grid-template-columns:1fr 1fr;gap:9px}
+  .dash-stat{padding:12px 13px}
+  .dash-stat-val{font-size:18px}
+  .plan-banner{flex-direction:column;gap:10px;align-items:flex-start}
+  .proj-table th:nth-child(3),.proj-table td:nth-child(3),
+  .proj-table th:nth-child(4),.proj-table td:nth-child(4){display:none}
+  .proj-table th,.proj-table td{padding:10px 9px;font-size:12px}
+
+  /* APP SHELL */
+  #view-app{padding-top:54px}
+  .app-topbar{padding:0 12px;height:46px;top:54px;gap:8px}
+  .app-proj-label{font-size:11px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #app-save-btn{display:none}
+  #app-export-btn{font-size:12px;padding:5px 10px}
+  .app-body{flex-direction:column;height:auto;overflow:visible;padding-bottom:64px}
+  .app-sidebar{display:none}
+  .app-content{padding:14px 14px 4px;overflow-y:visible}
+  .results-panel{display:none;width:100%;border-left:none;border-top:1px solid var(--border)}
+
+  /* FORM */
+  .fgrid,.fgrid-3{grid-template-columns:1fr}
+  .fgrid .fspan,.fgrid-3 .fspan{grid-column:1}
+  .form-card-body{padding:12px 13px}
+  .page-title{font-size:19px}
+  .page-sub{font-size:12px;margin-bottom:16px}
+  .form-nav{gap:8px;flex-wrap:nowrap}
+  .nav-btn{padding:8px 14px;font-size:13px}
+  .step-ind{font-size:11px}
+
+  /* MODALS */
+  .overlay{padding:0;align-items:flex-end}
+  .modal-box{border-radius:16px 16px 0 0;max-width:100%;animation:slideUp .25s ease both}
+  .photo-overlay{padding:0;align-items:flex-end}
+  .photo-modal-box{border-radius:16px 16px 0 0;max-width:100%}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+  /* PAYWALL */
+  .paywall{padding:0;align-items:flex-end}
+  .paywall-box{border-radius:16px 16px 0 0;max-width:100%;padding:28px 20px}
+
+  /* MOBILE RESULTS BAR */
+  #mobile-results-bar{
+    display:flex;
+    position:fixed;
+    bottom:0;left:0;right:0;
+    background:var(--navy2);
+    border-top:1px solid var(--border2);
+    padding:9px 14px;
+    align-items:center;
+    justify-content:space-between;
+    z-index:150;
+    backdrop-filter:blur(12px);
+  }
+  #mobile-results-drawer{
+    position:fixed;
+    bottom:0;left:0;right:0;
+    background:var(--navy2);
+    border-top:2px solid var(--border2);
+    border-radius:16px 16px 0 0;
+    z-index:200;
+    max-height:80vh;
+    overflow-y:auto;
+    padding:0 14px 20px;
+    transform:translateY(100%);
+    transition:transform .3s cubic-bezier(.32,.72,0,1);
+  }
+  #mobile-results-drawer.open{
+    display:block;
+    transform:translateY(0);
+  }
+  .mob-drawer-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:10px auto 14px}
+  .mob-drawer-close{position:absolute;top:10px;right:14px;background:var(--slate);border:none;color:var(--muted);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+  #mob-bar-rec{font-family:var(--head);font-size:15px;font-weight:700;color:var(--cyan)}
+  #mob-bar-cool{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:1px}
+  .mob-results-btn{background:var(--blue);border:none;color:#fff;padding:7px 14px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--body);display:flex;align-items:center;gap:5px;white-space:nowrap}
 }
 
 /* CITY AUTOCOMPLETE */
@@ -392,6 +495,14 @@ footer{padding:40px 5% 26px;position:relative;z-index:1;border-top:1px solid var
     <a id="nav-dash-link" style="font-size:13px;color:var(--muted);cursor:pointer;text-decoration:none;transition:color .2s">Dashboard</a>
     <a class="nav-cta" id="nav-newcalc-btn" style="font-size:13px;cursor:pointer">New calc</a>
     <div class="nav-avatar" id="nav-avatar">JD</div>
+  </div>
+  <!-- Mobile-only nav buttons (shown when nav ul is hidden) -->
+  <div class="nav-mobile-btns" style="display:none" id="nav-mobile-guest">
+    <a class="nav-login" id="mob-nav-login" style="font-size:13px;padding:6px 13px">Log in</a>
+    <a class="nav-cta" id="mob-nav-signup" style="font-size:13px;padding:6px 14px">Sign up</a>
+  </div>
+  <div class="nav-mobile-btns" style="display:none" id="nav-mobile-auth">
+    <div class="nav-avatar" id="mob-nav-avatar" style="width:28px;height:28px;font-size:11px">JD</div>
   </div>
 </nav>
 
@@ -1094,6 +1205,25 @@ footer{padding:40px 5% 26px;position:relative;z-index:1;border-top:1px solid var
       <div style="margin-top:11px;text-align:center"><a id="paywall-back-btn" style="font-size:13px;color:var(--muted);cursor:pointer;text-decoration:underline">Back to dashboard</a></div>
     </div>
   </div>
+
+  <!-- Mobile results sticky bar (phone only) -->
+  <div id="mobile-results-bar">
+    <div>
+      <div id="mob-bar-rec" style="font-family:var(--head);font-size:15px;font-weight:700;color:var(--cyan)">— tons</div>
+      <div id="mob-bar-cool" style="font-size:11px;color:var(--muted);font-family:var(--mono)">Fill in inputs to calculate</div>
+    </div>
+    <button class="mob-results-btn" id="mob-results-toggle">
+      Results
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 12V4M4 8l4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <!-- Mobile results drawer (slides up from bottom) -->
+  <div id="mobile-results-drawer">
+    <div class="mob-drawer-handle"></div>
+    <button class="mob-drawer-close" id="mob-drawer-close">&times;</button>
+    <div style="padding-top:4px" id="mobile-results-content"></div>
+  </div>
 </div>
 
 
@@ -1554,6 +1684,10 @@ function loginSuccess(user) {
   el('nav-guest').style.display = 'none';
   el('nav-auth').style.display = 'flex';
   el('nav-avatar').textContent = initials;
+  // mobile nav
+  var mg = el('nav-mobile-guest'); if (mg) mg.style.display = 'none';
+  var ma = el('nav-mobile-auth');  if (ma) ma.style.display = 'flex';
+  var mav = el('mob-nav-avatar'); if (mav) mav.textContent = initials;
   showView('dashboard');
 }
 
@@ -1563,6 +1697,9 @@ function logout() {
   state.calcCount = 0;
   el('nav-guest').style.display = '';
   el('nav-auth').style.display = 'none';
+  // mobile nav
+  var mg = el('nav-mobile-guest'); if (mg) mg.style.display = 'flex';
+  var ma = el('nav-mobile-auth');  if (ma) ma.style.display = 'none';
   showView('landing');
 }
 
@@ -2108,6 +2245,21 @@ function recalculate() {
   var sBar = el('r-shr-bar'); if (sBar) sBar.style.width = (shr*100) + '%';
   state.lastCalc = { recTons: recTons, totC: totC, totH: totH, sysCFM: Math.round(recTons * 400), shr: shr };
   calcDuctDesign();
+  updateMobileBar();
+}
+
+function updateMobileBar() {
+  var lc = state.lastCalc;
+  var barRec  = el('mob-bar-rec');
+  var barCool = el('mob-bar-cool');
+  if (!barRec) return;
+  if (lc && lc.recTons) {
+    barRec.textContent  = lc.recTons + ' tons';
+    barCool.textContent = fmtK(lc.totC) + ' BTUH cooling · ' + fmtK(lc.totH) + ' heating';
+  } else {
+    barRec.textContent  = '— tons';
+    barCool.textContent = 'Fill in inputs to calculate';
+  }
 }
 
 // =====================================================
@@ -2486,7 +2638,36 @@ function initCityAutocomplete() {
 // =====================================================
 // WIRE UP ALL EVENTS (no onclick attributes)
 // =====================================================
+function openMobileDrawer() {
+  var drawer  = el('mobile-results-drawer');
+  var content = el('mobile-results-content');
+  if (!drawer || !content) return;
+  // Clone results panel content into drawer
+  var panel = document.querySelector('.results-panel');
+  if (panel) content.innerHTML = panel.innerHTML;
+  drawer.style.display = 'block';
+  requestAnimationFrame(function() { drawer.classList.add('open'); });
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMobileDrawer() {
+  var drawer = el('mobile-results-drawer');
+  if (!drawer) return;
+  drawer.classList.remove('open');
+  document.body.style.overflow = '';
+  setTimeout(function() { drawer.style.display = 'none'; }, 300);
+}
+
 function wireEvents() {
+  // Mobile nav buttons
+  var ml = el('mob-nav-login');  if (ml) ml.onclick  = function() { openModal('login'); };
+  var ms = el('mob-nav-signup'); if (ms) ms.onclick  = function() { openModal('signup'); };
+  var mav = el('mob-nav-avatar'); if (mav) mav.onclick = function() { showView('dashboard'); };
+
+  // Mobile results drawer
+  var mrt = el('mob-results-toggle'); if (mrt) mrt.onclick = openMobileDrawer;
+  var mdc = el('mob-drawer-close');   if (mdc) mdc.onclick = closeMobileDrawer;
+
   // Nav
   el('nav-logo').onclick        = function() { showView('landing'); };
   el('nav-features').onclick    = function() { scrollToSection('features'); };
@@ -2662,6 +2843,9 @@ document.addEventListener('DOMContentLoaded', function() {
   initStatsCounter();
   selectPlan('free');
   initCityAutocomplete();
+  // Show mobile guest nav by default (hidden until user logs in)
+  var mg = el('nav-mobile-guest');
+  if (mg) mg.style.display = 'flex';
   tryAutoLogin();
 });
 
