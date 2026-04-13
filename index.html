@@ -1482,14 +1482,24 @@ function doLogin() {
   var pass  = el('login-pass').value;
   var errEl = el('login-err');
   var btn   = el('login-submit-btn');
-  if (!email || !pass) { errEl.classList.add('show'); return; }
+  if (!email || !pass) {
+    errEl.textContent = 'Please enter your email and password.';
+    errEl.classList.add('show');
+    return;
+  }
   btn.disabled = true; btn.textContent = 'Signing in…';
   _supa.auth.signInWithPassword({ email: email, password: pass })
     .then(function(res) {
       if (res.error) {
-        errEl.textContent = 'Invalid email or password.';
+        var msg = res.error.message || 'Invalid email or password.';
+        if (msg.toLowerCase().includes('email not confirmed')) {
+          msg = 'Please confirm your email before signing in. Check your inbox for a confirmation link.';
+        } else if (msg.toLowerCase().includes('invalid login')) {
+          msg = 'Invalid email or password.';
+        }
+        errEl.textContent = msg;
         errEl.classList.add('show');
-        setTimeout(function() { errEl.classList.remove('show'); }, 3000);
+        setTimeout(function() { errEl.classList.remove('show'); }, 5000);
       } else {
         var u = res.data.user;
         loginSuccess({ name: u.user_metadata.name || email.split('@')[0], email: u.email, plan: u.user_metadata.plan || 'free', company: u.user_metadata.company || '' });
@@ -1520,11 +1530,20 @@ function doSignup() {
     if (res.error) {
       errEl.textContent = res.error.message || 'Signup failed. Please try again.';
       errEl.classList.add('show');
-      setTimeout(function() { errEl.classList.remove('show'); }, 3000);
+      setTimeout(function() { errEl.classList.remove('show'); }, 4000);
+    } else if (res.data.session) {
+      // Session created immediately — email confirmation is off
+      var u = res.data.user;
+      loginSuccess({ name: name, email: u.email, plan: u.user_metadata.plan || 'free', company: company });
     } else {
-      loginSuccess({ name: name, email: email, plan: 'free', company: company });
+      // Email confirmation required
+      btn.textContent = 'Check your email!';
+      btn.style.background = 'var(--green)';
+      errEl.style.color = 'var(--green)';
+      errEl.textContent = 'Account created! Check your inbox to confirm your email, then sign in.';
+      errEl.classList.add('show');
     }
-  }).finally(function() { btn.disabled = false; btn.textContent = 'Create account'; });
+  }).finally(function() { btn.disabled = false; });
 }
 
 function loginSuccess(user) {
