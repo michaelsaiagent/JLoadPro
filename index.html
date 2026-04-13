@@ -386,7 +386,7 @@ footer{padding:40px 5% 26px;position:relative;z-index:1;border-top:1px solid var
     <li><a id="nav-howitworks">How it works</a></li>
     <li><a id="nav-pricing">Pricing</a></li>
     <li><a class="nav-login" id="nav-login-btn">Log in</a></li>
-    <li><a class="nav-cta" id="nav-signup-btn">Sign up!</a></li>
+    <li><a class="nav-cta" id="nav-signup-btn">Sign up</a></li>
   </ul>
   <div id="nav-auth" class="nav-user" style="display:none">
     <a id="nav-dash-link" style="font-size:13px;color:var(--muted);cursor:pointer;text-decoration:none;transition:color .2s">Dashboard</a>
@@ -1069,6 +1069,10 @@ footer{padding:40px 5% 26px;position:relative;z-index:1;border-top:1px solid var
       <div class="res-card"><div class="res-lbl">Heating load</div><div class="res-val o" id="r-heat">-</div><div class="res-sub">BTUH</div></div>
       <div class="res-card"><div class="res-lbl">SHR</div><div class="res-val g" id="r-shr">-</div><div class="shr-bar"><div class="shr-fill" id="r-shr-bar" style="width:0%"></div></div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:var(--mono)"><span>humid</span><span>dry</span></div></div>
       <div class="rec-card"><div class="rec-lbl">Manual S</div><div class="rec-val" id="r-rec">-</div><div class="rec-note" id="r-rec-note">Complete inputs to get sizing</div></div>
+      <div class="res-card" id="duct-design-card">
+        <div class="res-lbl">Manual D Duct Design</div>
+        <div style="color:var(--muted);font-size:12px;margin-top:6px">Complete inputs to see duct sizing.</div>
+      </div>
       <button class="export-btn" id="panel-export-btn">
         <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4 12h8M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Export PDF report
@@ -1199,7 +1203,8 @@ var state = {
   selectedPlan: 'free',
   currentStep: 0,
   activeCamTarget: null,
-  pendingCamValue: null
+  pendingCamValue: null,
+  lastCalc: { recTons: 0, totC: 0, totH: 0, sysCFM: 0, shr: 0 }
 };
 
 var DEMO_USER = { name: 'John Doe', email: 'demo@loadpro.io', plan: 'free', initials: 'JD' };
@@ -1658,7 +1663,197 @@ function goToResults() {
 function doExport() {
   var isPro = state.user && (state.user.plan === 'pro' || state.user.plan === 'team');
   if (!isPro) { alert('PDF export is available on the Pro plan. Upgrade to export branded, permit-ready reports.'); openModal('signup', 'pro'); return; }
-  alert('In the full build, this generates a complete permit-ready PDF with your company logo, all inputs, and the Manual S equipment sizing summary.');
+
+  var lc        = state.lastCalc;
+  var projName  = (el('proj-name')  || {}).value || 'Untitled Project';
+  var cityState = (el('city-state') || {}).value || '';
+  var zip       = (el('zipcode')    || {}).value || '';
+  var projAddr  = [cityState, zip].filter(Boolean).join(' ') || '—';
+  var sqft      = (el('floor-area') || {}).value || '—';
+  var climate   = el('c-city') ? el('c-city').textContent : '—';
+
+  var sens  = el('r-sens')     ? el('r-sens').textContent     : '—';
+  var lat   = el('r-lat')      ? el('r-lat').textContent      : '—';
+  var cool  = el('r-cool')     ? el('r-cool').textContent     : '—';
+  var heat  = el('r-heat')     ? el('r-heat').textContent     : '—';
+  var shr   = el('r-shr')      ? el('r-shr').textContent      : '—';
+  var rec   = el('r-rec')      ? el('r-rec').textContent      : '—';
+  var recNote = el('r-rec-note') ? el('r-rec-note').textContent : '—';
+
+  var fr     = parseFloat((el('duct-fr-input') || {}).value) || 0.10;
+  var sysCFM = lc.sysCFM || 0;
+  var trunkD = sysCFM ? sizeDuct(sysCFM, fr) : '—';
+  var retD   = sysCFM ? sizeDuct(Math.round(sysCFM * 0.9), fr) : '—';
+
+  var roomRows = '';
+  document.querySelectorAll('#rooms-tbody tr').forEach(function(row) {
+    var tds = row.querySelectorAll('td');
+    if (tds.length < 4) return;
+    var rName = tds[0].textContent.trim();
+    var rCfm  = parseInt(tds[3].textContent.replace(/,/g,'')) || 0;
+    if (!rCfm) return;
+    var rDia = sizeDuct(rCfm, fr);
+    var rVel = ductVelocity(rCfm, rDia);
+    roomRows += '<tr><td>' + rName + '</td><td>' + tds[1].textContent.trim() + ' ft²</td>' +
+      '<td>' + tds[2].textContent.trim() + ' BTUH</td>' +
+      '<td>' + rCfm + ' CFM</td><td>' + rDia + '"</td><td>' + rVel + ' FPM</td></tr>';
+  });
+
+  var now = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+  el('print-report').innerHTML =
+    '<div class="pr-header">' +
+      '<div class="pr-logo">JLoad<span>Pro</span></div>' +
+      '<div class="pr-meta"><div class="pr-title">' + projName + '</div>' +
+      '<div class="pr-sub">' + projAddr + ' &nbsp;|&nbsp; Generated ' + now + '</div></div>' +
+    '</div>' +
+    '<div class="pr-section-title">Project Summary</div>' +
+    '<table class="pr-table"><tbody>' +
+      '<tr><td>Climate Location</td><td>' + climate + '</td></tr>' +
+      '<tr><td>Conditioned Area</td><td>' + sqft + ' ft²</td></tr>' +
+    '</tbody></table>' +
+    '<div class="pr-section-title">Manual J — Load Summary</div>' +
+    '<table class="pr-table"><tbody>' +
+      '<tr><td>Sensible Cooling</td><td>' + sens + ' BTUH</td></tr>' +
+      '<tr><td>Latent Cooling</td><td>' + lat + ' BTUH</td></tr>' +
+      '<tr><td>Total Cooling Load</td><td><strong>' + cool + ' BTUH</strong></td></tr>' +
+      '<tr><td>Heating Load</td><td>' + heat + ' BTUH</td></tr>' +
+      '<tr><td>Sensible Heat Ratio</td><td>' + shr + '</td></tr>' +
+    '</tbody></table>' +
+    '<div class="pr-section-title">Manual S — Equipment Sizing</div>' +
+    '<table class="pr-table"><tbody>' +
+      '<tr><td>Recommended Equipment</td><td><strong>' + rec + '</strong></td></tr>' +
+      '<tr><td>Nominal Capacity</td><td>' + recNote + '</td></tr>' +
+    '</tbody></table>' +
+    '<div class="pr-section-title">Manual D — Duct Design</div>' +
+    '<table class="pr-table"><tbody>' +
+      '<tr><td>Total System CFM</td><td>' + (sysCFM || '—') + (sysCFM ? ' CFM' : '') + '</td></tr>' +
+      '<tr><td>Design Friction Rate</td><td>' + fr.toFixed(2) + ' in. w.g. / 100 ft</td></tr>' +
+      '<tr><td>Supply Trunk</td><td>' + trunkD + (trunkD !== '—' ? '" round' : '') + '</td></tr>' +
+      '<tr><td>Return Trunk</td><td>' + retD + (retD !== '—' ? '" round' : '') + '</td></tr>' +
+    '</tbody></table>' +
+    (roomRows ?
+      '<div class="pr-section-title">Branch Duct Schedule</div>' +
+      '<table class="pr-table pr-room-table"><thead><tr>' +
+        '<th>Room</th><th>Area</th><th>Load</th><th>CFM</th><th>Diameter</th><th>Velocity</th>' +
+      '</tr></thead><tbody>' + roomRows + '</tbody></table>'
+    : '') +
+    '<div class="pr-footer">Manual J · Manual S · Manual D &nbsp;|&nbsp; ACCA-compliant load calculation &nbsp;|&nbsp; JLoadPro</div>';
+
+  window.print();
+}
+
+// =====================================================
+// MANUAL D — DUCT DESIGN ENGINE
+// =====================================================
+// Round duct capacity at FR = 0.10 in. w.g./100 ft (ACCA Manual D)
+var DUCT_SIZES = [
+  {d:4,cfm:28},{d:5,cfm:50},{d:6,cfm:80},{d:7,cfm:120},{d:8,cfm:172},{d:9,cfm:237},
+  {d:10,cfm:316},{d:12,cfm:524},{d:14,cfm:800},{d:16,cfm:1145},{d:18,cfm:1576},{d:20,cfm:2098}
+];
+
+function sizeDuct(cfm, fr) {
+  var scale = Math.sqrt(fr / 0.10);
+  for (var i = 0; i < DUCT_SIZES.length; i++) {
+    if (DUCT_SIZES[i].cfm * scale >= cfm) return DUCT_SIZES[i].d;
+  }
+  return 20;
+}
+
+function ductVelocity(cfm, d) {
+  var r_ft = (d / 2) / 12;
+  return Math.round(cfm / (Math.PI * r_ft * r_ft));
+}
+
+function calcDuctDesign() {
+  var dcard = el('duct-design-card');
+  if (!dcard) return;
+
+  var lc = state.lastCalc;
+  if (!lc || !lc.recTons) {
+    dcard.innerHTML = '<div class="res-lbl">Manual D Duct Design</div><div style="color:var(--muted);font-size:12px;margin-top:6px">Complete inputs to see duct sizing.</div>';
+    return;
+  }
+
+  var isPro = state.user && (state.user.plan === 'pro' || state.user.plan === 'team');
+  if (!isPro) {
+    dcard.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:center">' +
+        '<div class="res-lbl">Manual D Duct Design</div>' +
+        '<span style="font-size:10px;background:rgba(26,86,219,0.18);color:var(--cyan);border-radius:4px;padding:2px 6px;font-family:var(--mono)">PRO</span>' +
+      '</div>' +
+      '<div style="color:var(--muted);font-size:12px;margin-top:8px">Upgrade to Pro for room-by-room duct sizing.</div>';
+    return;
+  }
+
+  var fr   = parseFloat((el('duct-fr-input') || {}).value) || 0.10;
+  var sys  = lc.sysCFM;
+  var supD = sizeDuct(sys, fr);
+  var retD = sizeDuct(Math.round(sys * 0.9), fr);
+  var supV = ductVelocity(sys, supD);
+  var retV = ductVelocity(Math.round(sys * 0.9), retD);
+
+  var roomRows = '';
+  document.querySelectorAll('#rooms-tbody tr').forEach(function(row) {
+    var tds = row.querySelectorAll('td');
+    if (tds.length < 4) return;
+    var rName = tds[0].textContent.trim();
+    var rCfm  = parseInt(tds[3].textContent.replace(/,/g,'')) || 0;
+    if (!rCfm) return;
+    var rDia = sizeDuct(rCfm, fr);
+    var rVel = ductVelocity(rCfm, rDia);
+    var velStyle = rVel > 900 ? 'color:var(--orange)' : 'color:var(--muted)';
+    roomRows +=
+      '<tr>' +
+        '<td style="padding:5px 3px;font-size:12px">' + rName + '</td>' +
+        '<td style="padding:5px 3px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--cyan)">' + rCfm + '</td>' +
+        '<td style="padding:5px 3px;text-align:right;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--white)">' + rDia + '"</td>' +
+        '<td style="padding:5px 3px;text-align:right;font-family:var(--mono);font-size:11px;' + velStyle + '">' + rVel + '</td>' +
+      '</tr>';
+  });
+
+  dcard.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">' +
+      '<div class="res-lbl">Manual D Duct Design</div>' +
+      '<div style="display:flex;align-items:center;gap:5px">' +
+        '<span style="font-size:10px;color:var(--muted)">FR:</span>' +
+        '<input id="duct-fr-input" type="number" value="' + fr.toFixed(2) + '" step="0.01" min="0.05" max="0.20"' +
+          ' style="width:52px;font-size:11px;padding:2px 5px;background:var(--slate);border:1px solid var(--border2);border-radius:4px;color:var(--white);font-family:var(--mono)"' +
+          ' title="Design friction rate (in. w.g./100 ft)">' +
+        '<span style="font-size:10px;color:var(--muted)">"wg</span>' +
+      '</div>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">' +
+      '<div style="background:var(--navy2);border:1px solid var(--border);border-radius:6px;padding:7px;text-align:center">' +
+        '<div style="font-size:9px;color:var(--muted);margin-bottom:2px;font-family:var(--mono)">SYS CFM</div>' +
+        '<div style="font-size:17px;font-weight:700;font-family:var(--mono);color:var(--white)">' + sys + '</div>' +
+      '</div>' +
+      '<div style="background:var(--navy2);border:1px solid var(--border);border-radius:6px;padding:7px;text-align:center">' +
+        '<div style="font-size:9px;color:var(--muted);margin-bottom:2px;font-family:var(--mono)">SUPPLY</div>' +
+        '<div style="font-size:17px;font-weight:700;font-family:var(--mono);color:var(--cyan)">' + supD + '"</div>' +
+        '<div style="font-size:9px;color:var(--muted);font-family:var(--mono)">' + supV + ' fpm</div>' +
+      '</div>' +
+      '<div style="background:var(--navy2);border:1px solid var(--border);border-radius:6px;padding:7px;text-align:center">' +
+        '<div style="font-size:9px;color:var(--muted);margin-bottom:2px;font-family:var(--mono)">RETURN</div>' +
+        '<div style="font-size:17px;font-weight:700;font-family:var(--mono);color:var(--blue)">' + retD + '"</div>' +
+        '<div style="font-size:9px;color:var(--muted);font-family:var(--mono)">' + retV + ' fpm</div>' +
+      '</div>' +
+    '</div>' +
+    (roomRows ?
+      '<table style="width:100%;border-collapse:collapse">' +
+        '<thead><tr style="border-bottom:1px solid var(--border2)">' +
+          '<th style="text-align:left;padding:4px 3px;font-size:9px;color:var(--muted);font-weight:400;font-family:var(--mono)">ROOM</th>' +
+          '<th style="text-align:right;padding:4px 3px;font-size:9px;color:var(--muted);font-weight:400;font-family:var(--mono)">CFM</th>' +
+          '<th style="text-align:right;padding:4px 3px;font-size:9px;color:var(--muted);font-weight:400;font-family:var(--mono)">DIA</th>' +
+          '<th style="text-align:right;padding:4px 3px;font-size:9px;color:var(--muted);font-weight:400;font-family:var(--mono)">FPM</th>' +
+        '</tr></thead>' +
+        '<tbody>' + roomRows + '</tbody>' +
+      '</table>' :
+      '<div style="color:var(--muted);font-size:11px;text-align:center;padding:8px">Add rooms in step 8 for branch sizing</div>'
+    );
+
+  var frInp = el('duct-fr-input');
+  if (frInp) frInp.addEventListener('input', calcDuctDesign);
 }
 
 function saveDraft() {
@@ -1892,6 +2087,8 @@ function recalculate() {
   setText('r-rec',      recTons + ' tons');
   setText('r-rec-note', fmtK(recTons*12000) + ' BTUH / ' + recTons + '-ton unit');
   var sBar = el('r-shr-bar'); if (sBar) sBar.style.width = (shr*100) + '%';
+  state.lastCalc = { recTons: recTons, totC: totC, totH: totH, sysCFM: Math.round(recTons * 400), shr: shr };
+  calcDuctDesign();
 }
 
 // =====================================================
@@ -1940,7 +2137,7 @@ function handleCamFile(targetId, fileInput) {
 function extractFromPhoto(base64, mediaType, meta) {
   var unitHint = meta.unit ? 'The field expects a number in ' + meta.unit + '.' : 'A plain whole number.';
   var prompt = 'You are an HVAC measurement extraction assistant. A field tech uploaded a photo to fill the field: "' + meta.label + '". ' + unitHint + ' Read any visible measurement (laser measure display, tape measure, blueprint, label). Respond ONLY with valid JSON, no markdown: {"value": <number or null>, "note": "<brief explanation>"}';
-  return fetch('https://api.anthropic.com/v1/messages', {
+  return fetch('/ai-photo', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -2451,5 +2648,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
 })();
 </script>
+
+<!-- ==================== PRINT REPORT ==================== -->
+<div id="print-report"></div>
+
+<style>
+#print-report { display: none; }
+</style>
+<style media="print">
+  body > *:not(#print-report) { display: none !important; }
+  #print-report { display: block !important; font-family: 'Inter', sans-serif; color: #111; background: #fff; padding: 32px 40px; font-size: 13px; line-height: 1.6; }
+  .pr-header { display: flex; align-items: flex-start; gap: 24px; border-bottom: 2px solid #0a0f1e; padding-bottom: 14px; margin-bottom: 18px; }
+  .pr-logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: #0a0f1e; letter-spacing: -0.5px; white-space: nowrap; }
+  .pr-logo span { color: #06b6d4; }
+  .pr-title { font-size: 17px; font-weight: 700; color: #0a0f1e; }
+  .pr-sub { font-size: 12px; color: #555; }
+  .pr-section-title { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #0369a1; border-bottom: 1px solid #e0e7ef; padding-bottom: 4px; margin: 16px 0 8px; }
+  .pr-table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+  .pr-table td, .pr-table th { padding: 5px 8px; border-bottom: 1px solid #f0f4ff; font-size: 12px; }
+  .pr-table td:first-child { color: #555; width: 200px; }
+  .pr-table td:last-child { font-weight: 500; color: #0a0f1e; }
+  .pr-room-table th { text-align: left; font-weight: 600; color: #0a0f1e; font-size: 11px; background: #f8fafc; }
+  .pr-room-table td { color: #0a0f1e; }
+  .pr-footer { margin-top: 28px; border-top: 1px solid #e0e7ef; padding-top: 10px; font-size: 10px; color: #888; text-align: center; }
+</style>
 </body>
 </html>
